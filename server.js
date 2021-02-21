@@ -6,7 +6,9 @@ const helmet = require('helmet')
 const POKEDEX = require('./pokedex.json')
 const app = express()
 
-app.use(morgan('dev'))
+// app.use(morgan('dev'))
+const morganSetting = process.env.NODE_ENV === 'production' ? 'tiny' : 'common'
+app.use(morgan(morganSetting))
 app.use(helmet())
 app.use(cors())
 
@@ -36,7 +38,6 @@ app.get('/types', handleGetTypes)
 // -------- end point /pokemon
 function handleGetPokemon(req, res) {
   const { name = "", type = "" } = req.query;
-  // debugger;
   // search for name
   let response = POKEDEX.pokemon;
 
@@ -50,6 +51,7 @@ function handleGetPokemon(req, res) {
 
   if (type)
   {
+    // type is parameters are case sensitive.
     response = response.filter(item =>
       // item.type.includes(type.toLowerCase())
       item.type.includes(type)
@@ -60,21 +62,28 @@ function handleGetPokemon(req, res) {
 }
 app.get('/pokemon', handleGetPokemon)
 
+app.use((error, req, res, next) => {
+  let response
+  if (process.env.NODE_ENV === 'production')
+  {
+    response = { error: { message: 'server error' } }
+  } else
+  {
+    response = { error }
+  }
+  res.status(500).json(response)
+})
+
+
 const PORT = process.env.PORT || 8000
 
 app.listen(PORT, () => {
   console.log(`Server listening at http://localhost:${PORT}`)
 })
 
-/*
+/* for local test use.
 http://localhost:8000/pokemon?type=Grass
 http://localhost:8000/pokemon?type=Grass&name=Ivysaur
 http://localhost:8000/pokemon?name=Ivysaur
 http://localhost:8000/pokemon?name=Venusaur
-"name": "Ivysaur"
-"name": "Venusaur"
-"type": [
-  "Grass",
-  "Poison"
-],
 */
