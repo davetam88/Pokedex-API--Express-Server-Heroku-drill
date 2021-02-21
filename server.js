@@ -13,8 +13,6 @@ app.use(cors())
 
 const validTypes = [`Bug`, `Dark`, `Dragon`, `Electric`, `Fairy`, `Fighting`, `Fire`, `Flying`, `Ghost`, `Grass`, `Ground`, `Ice`, `Normal`, `Poison`, `Psychic`, `Rock`, `Steel`, `Water`]
 
-console.log(`validTypes :>> `, validTypes); // dbg..
-
 // -------- validation middleware
 app.use(function validateBearerToken(req, res, next) {
   const apiToken = process.env.API_TOKEN
